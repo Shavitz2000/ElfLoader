@@ -64,6 +64,11 @@ int load_segments(int fd, const Elf64_Ehdr *elf)
     Elf64_Phdr phdr;
     long page_size = sysconf(_SC_PAGESIZE);
 
+    if (sizeof(phdr) != elf->e_phentsize)
+    {
+        perror("e_phentsize not equal to sizeof(phdr)");
+    }
+
     if (lseek(fd, elf->e_phoff, SEEK_SET) == -1)
     {
         perror("lseek failed");
@@ -78,11 +83,6 @@ int load_segments(int fd, const Elf64_Ehdr *elf)
 
     for (int i = 0; i < elf->e_phnum; i++)
     {
-
-        if (sizeof(phdr) != elf->e_phentsize)
-        {
-            perror("e_phentsize not equal to sizeof(phdr)");
-        }
         if (read(fd, &phdr, elf->e_phentsize) != sizeof(phdr))
         {
             perror("Problem in reading program header");
